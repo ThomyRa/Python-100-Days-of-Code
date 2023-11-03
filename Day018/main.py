@@ -1,72 +1,82 @@
 from turtle import Turtle, Screen
 import random
 
-def drawing_square(timmy):
+
+############################################################
+# Drawing square
+def drawing_square(turtle_obj):
     for _ in range(4):
-        timmy.forward(100)
-        timmy.left(90)
-
-########### Challenge 2 - Draw a Dashed Line ########
-def dashed_line(timmy):
-    for _ in range(15):
-        timmy.forward(10)
-        timmy.penup()
-        timmy.forward(10)
-        timmy.pendown()
+        turtle_obj.forward(100)
+        turtle_obj.right(90)
 
 
-def random_rgb():
-    random_color = []
+############################################################
+# Dash Line
+def dash_line(turtle_obj):
+    for _ in range(10):
+        turtle_obj.pendown()
+        turtle_obj.forward(10)
+        turtle_obj.penup()
+        turtle_obj.forward(10)
+
+
+############################################################
+# Drawing different shapes
+def drawing_shape(turtle_obj, num_of_sides, size):
+    degree = 360 / num_of_sides
+    for _ in range(num_of_sides):
+        turtle_obj.forward(size)
+        turtle_obj.right(degree)
+
+
+def random_color():
+    color = []
     for _ in range(3):
-        random_color.append(random.randint(0, 255))
-    return tuple(random_color)
+        layer = random.randint(0, 255)
+        color.append(layer)
+    return tuple(color)
 
 
-########### Challenge 3 - Draw a different shapes ########
-def drawing_shapes(timmy):
-    num_sides = 3
-    while num_sides <= 10:
-        timmy.color(random_rgb())
-        for _ in range(num_sides):
-            timmy.fd(50)
-            timmy.rt(360 // num_sides)
-        num_sides += 1
+def drawing_different_shapes(turtle_obj, size):
+    for _ in range(3, 11):
+        turtle_obj.color(random_color())
+        drawing_shape(turtle_obj, _, size)
 
 
-def random_walk(timmy):
-    timmy.width(5)
-    steps = 0
-    timmy.speed("fast")
-    while steps < 100:
-        timmy.color(random_rgb())
-        angle = [0, 90, 180, 270]
-        direction = random.choice(angle)
-        timmy.setheading(direction)
-        timmy.fd(20)
-        steps += 1
+############################################################
+# Random Walk
+def random_walk(turtle_obj):
+    direction = [90, 180, 270, 360]
+    for _ in range(250):
+        turtle_obj.pensize(5)
+        turtle_obj.color(random_color())
+        turtle_obj.setheading(random.choice(direction))
+        turtle_obj.forward(20)
 
 
-def spirograph(timmy):
-    degrees = 5
-    timmy.speed("fastest")
-    timmy.width(2)
-    for _ in range(360 // degrees):
-        timmy.color(random_rgb())
-        timmy.circle(100)
-        timmy.lt(degrees)
+############################################################
+# Spirograph
+def spirograph(turtle_obj, gap_size):
+    num_circles = 360 // gap_size
+    degrees = 0
+    for _ in range(num_circles):
+        turtle_obj.setheading(degrees)
+        turtle_obj.color(random_color())
+        turtle_obj.circle(100)
+        degrees += 5
 
 
 timmy = Turtle()
 timmy.shape("turtle")
+timmy.speed("fastest")
 
 screen = Screen()
 screen.colormode(255)
 
-spirograph(timmy)
-# random_walk(timmy)
-# drawing_shapes(timmy)
 # drawing_square(timmy)
-# dashed_line(timmy)
-
+# dash_line(timmy)
+# drawing_different_shapes(timmy, 50)
+# random_walk(timmy)
+spirograph(timmy, 5)
 
 screen.exitonclick()
