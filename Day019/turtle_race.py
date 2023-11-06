@@ -5,31 +5,29 @@ screen = Screen()
 screen.setup(width=500, height=400)
 user_bet = screen.textinput(title="Make your bet", prompt="Which turtle will win the race? Enter a color")
 colors = ["red", "orange", "yellow", "green", "blue", "purple"]
-y_positions = [-70, -40, -10, 20, 50, 80]
+y_positions = [80, 50, 20, -20, -50, -80]
 all_turtles = []
 
 # Create 6 turtles
-for turtle in range(6):
-    new_turtle = Turtle()
-    new_turtle.shape("turtle")
+for turtle_idx in range(6):
+    new_turtle = Turtle(shape="turtle")
     new_turtle.penup()
-    new_turtle.color(colors[turtle])
-    new_turtle.goto(x=-230, y=y_positions[turtle])
+    new_turtle.color(colors[turtle_idx])
+    new_turtle.goto(x=-230, y=y_positions[turtle_idx])
     all_turtles.append(new_turtle)
 
-if user_bet:
-    is_race_on = True
-
-while is_race_on:
-    for turtle in all_turtles:
-        if turtle.xcor() > 230:
-            is_race_on = False
-            winning_color = turtle.pencolor()
-            if winning_color == user_bet:
-                print(f"You've won! The {winning_color} turtle is the winner")
+while bool(user_bet):
+    for turtle_idx in range(6):
+        if all_turtles[turtle_idx].xcor() <= 230:
+            all_turtles[turtle_idx].forward(random.randint(1, 10))
+        else:
+            winner = all_turtles[turtle_idx].color()
+            if winner == user_bet.lower():
+                print("You've won!")
             else:
-                print(f"You've lost! The {winning_color} turtle is the winner")
-        rand_dist = random.randint(0, 10)
-        turtle.forward(rand_dist)
+                print("You've lost")
+            print(f"The winner turtle is: {winner[0]}")
+            turtle_idx = 5
+            user_bet = False
 
 screen.exitonclick()
