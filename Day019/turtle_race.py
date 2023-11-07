@@ -3,7 +3,7 @@ from turtle import Turtle, Screen
 
 screen = Screen()
 screen.setup(width=500, height=400)
-user_bet = screen.textinput(title="Make your bet", prompt="Which turtle will win the race? Enter a color")
+user_bet = screen.textinput(title="Make your bet", prompt="Which turtle will win the race? Enter a color").lower()
 colors = ["red", "orange", "yellow", "green", "blue", "purple"]
 y_positions = [80, 50, 20, -20, -50, -80]
 all_turtles = []
@@ -18,16 +18,17 @@ for turtle_idx in range(6):
 
 while bool(user_bet):
     for turtle_idx in range(6):
-        if all_turtles[turtle_idx].xcor() <= 230:
+        if all_turtles[turtle_idx].xcor() < 230:
             all_turtles[turtle_idx].forward(random.randint(1, 10))
         else:
             winner = all_turtles[turtle_idx].color()
-            if winner == user_bet.lower():
+            if winner[1] == user_bet:
                 print("You've won!")
+                turtle_idx = 6
             else:
                 print("You've lost")
-            print(f"The winner turtle is: {winner[0]}")
-            turtle_idx = 5
+            print(f"The winner turtle is: {winner[1]}")
+            turtle_idx = 6
             user_bet = False
 
 screen.exitonclick()
