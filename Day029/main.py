@@ -5,7 +5,20 @@ WIDTH = 40
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 
+
+def save_user_data():
+    website = txt_website.get()
+    txt_website.delete(0, "end")
+    email = txt_email.get()
+    password = txt_password.get()
+    txt_password.delete(0, "end")
+    user_info = f"{website}, {email}, {password}\n"
+
+    with open("./data.txt", "a") as data:
+        data.write(user_info)
+
 # ---------------------------- UI SETUP ------------------------------- #
+
 
 window = Tk()
 window.title("Password Manager")
@@ -28,6 +41,7 @@ lbl_website.grid(row=1, column=0)
 
 # Input Website
 txt_website = Entry(width=WIDTH)
+txt_website.focus()
 txt_website.grid(row=1, column=1, columnspan=2)
 
 # Label Email
@@ -39,6 +53,7 @@ lbl_email.grid(row=2, column=0)
 
 # Input Email
 txt_email = Entry(width=WIDTH)
+txt_email.insert(0, "my_email@email.com")
 txt_email.grid(row=2, column=1, columnspan=2)
 
 # Label Password
@@ -61,7 +76,8 @@ btn_generate_password.grid(row=3, column=2)
 # Button Add
 btn_add = Button(text="Add",
                  width=44,
-                 font=("Arial", 10))
+                 font=("Arial", 10),
+                 command=save_user_data)
 btn_add.grid(row=4, column=1, columnspan=2)
 
 window.mainloop()

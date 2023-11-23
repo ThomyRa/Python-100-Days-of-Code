@@ -1,0 +1,4 @@
+Reddit, my_email@email.com, qwerty12345
+Facebook, my_email@email.com, zxcvb09876
+gmail, my_email@email.com, asdsdvs349587
+Twitter, my_email@email.com, sdfasd ¡?=2
