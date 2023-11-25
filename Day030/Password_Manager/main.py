@@ -56,6 +56,31 @@ def save_user_data():
             txt_website.delete(0, "end")
             txt_password.delete(0, "end")
 
+# ---------------------------- SEARCH WEBSITE------------------------------- #
+
+
+def search_website():
+    if len(txt_website.get()) == 0:
+        messagebox.showinfo(title="Oops",
+                            message="Please insert a website to search.")
+    else:
+        try:
+            with open("./data.json", "r") as data_file:
+                data = json.load(data_file)
+        except FileNotFoundError:
+            messagebox.showinfo(title="Oops",
+                                message="File not found")
+        else:
+            website = txt_website.get()
+            try:
+                email = data[txt_website.get()]["email"]
+            except KeyError:
+                messagebox.showinfo(title="Oops",
+                                    message="Website not found.")
+            else:
+                password = data[txt_website.get()]["password"]
+                messagebox.showinfo(title=website,
+                                    message=f"Email: {email}\nPassword: {password}")
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -80,9 +105,16 @@ lbl_website.config(padx=10, pady=5)
 lbl_website.grid(row=1, column=0)
 
 # Input Website
-txt_website = Entry(width=WIDTH)
+txt_website = Entry(width=24)
 txt_website.focus()
-txt_website.grid(row=1, column=1, columnspan=2)
+txt_website.grid(row=1, column=1)
+
+# Button Search Website
+btn_search = Button(text="Search",
+                    width=14,
+                    font=("Arial", 10),
+                    command=search_website)
+btn_search.grid(row=1, column=2)
 
 # Label Email
 lbl_email = Label(text="Email/Username",
