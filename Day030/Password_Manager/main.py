@@ -72,15 +72,14 @@ def search_website():
                                 message="File not found")
         else:
             website = txt_website.get()
-            try:
+            if website in data:
                 email = data[website]["email"]
-            except KeyError:
-                messagebox.showinfo(title="Oops",
-                                    message="Website not found.")
-            else:
                 password = data[website]["password"]
                 messagebox.showinfo(title=website,
                                     message=f"Email: {email}\nPassword: {password}")
+            else:
+                messagebox.showinfo(title="Error",
+                                    message=f"No details for {website} found.")
 
 # ---------------------------- UI SETUP ------------------------------- #
 
