@@ -68,17 +68,17 @@ def search_website():
             with open("./data.json", "r") as data_file:
                 data = json.load(data_file)
         except FileNotFoundError:
-            messagebox.showinfo(title="Oops",
+            messagebox.showinfo(title="Error",
                                 message="File not found")
         else:
             website = txt_website.get()
             try:
-                email = data[txt_website.get()]["email"]
+                email = data[website]["email"]
             except KeyError:
                 messagebox.showinfo(title="Oops",
                                     message="Website not found.")
             else:
-                password = data[txt_website.get()]["password"]
+                password = data[website]["password"]
                 messagebox.showinfo(title=website,
                                     message=f"Email: {email}\nPassword: {password}")
 
