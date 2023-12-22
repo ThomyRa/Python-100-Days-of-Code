@@ -3,6 +3,8 @@ from quiz_brain import QuizBrain
 
 
 THEME_COLOR = "#375362"
+RIGHT_GREEN = "#29b677"
+WRONG_RED = "#ee665d"
 
 
 class QuizInterface:
@@ -41,11 +43,19 @@ class QuizInterface:
         self.canvas.grid(row=1, column=0, columnspan=2, pady=50)
 
         img_true = PhotoImage(file="./images/true.png")
-        self.btn_true = Button(image=img_true, highlightthickness=0)
+        self.btn_true = Button(
+            image=img_true,
+            highlightthickness=0,
+            command=self.send_answer_true
+        )
         self.btn_true.grid(row=2, column=1)
 
         img_false = PhotoImage(file="./images/false.png")
-        self.btn_false = Button(image=img_false, highlightthickness=0)
+        self.btn_false = Button(
+            image=img_false,
+            highlightthickness=0,
+            command=self.send_answer_false
+        )
         self.btn_false.grid(row=2, column=0)
 
         self.get_next_question()
@@ -53,7 +63,19 @@ class QuizInterface:
         self.window.mainloop()
 
     def get_next_question(self):
+        self.canvas.config(bg="white")
         q_text = self.quiz.next_question()
         self.canvas.itemconfig(self.question, text=q_text)
 
+    def send_answer_true(self):
+        self.give_feedback(self.quiz.check_answer("True"))
 
+    def send_answer_false(self):
+        self.give_feedback(self.quiz.check_answer("False"))
+
+    def give_feedback(self, is_right):
+        if is_right:
+            self.canvas.config(bg=RIGHT_GREEN)
+        else:
+            self.canvas.config(bg=WRONG_RED)
+        self.window.after(1000, self.get_next_question)
