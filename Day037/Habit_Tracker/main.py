@@ -54,12 +54,23 @@ headers = {
 ####################################################
 # UPDATING A PIXEL
 
+# today = datetime.datetime.now()
+# print(today.strftime("%Y%m%d"))
+# update_endpoint = f"{PIXELA_ENDPOINT}/{USERNAME}/graphs/{GRAPH_ID}/{today.strftime('%Y%m%d')}"
+# print(update_endpoint)
+# update_pixel_conf = {
+#     "quantity": "60",
+# }
+# response = requests.put(url=update_endpoint, json=update_pixel_conf, headers=headers)
+# print(response.text)
+
+####################################################
+# DELETING A PIXEL
+
 today = datetime.datetime.now()
 print(today.strftime("%Y%m%d"))
-update_endpoint = f"{PIXELA_ENDPOINT}/{USERNAME}/graphs/{GRAPH_ID}/{today.strftime('%Y%m%d')}"
-print(update_endpoint)
-update_pixel_conf = {
-    "quantity": "60",
-}
-response = requests.put(url=update_endpoint, json=update_pixel_conf, headers=headers)
+delete_pixel = f"{PIXELA_ENDPOINT}/{USERNAME}/graphs/{GRAPH_ID}/{today.strftime('%Y%m%d')}"
+print(delete_pixel)
+
+response = requests.delete(url=delete_pixel, headers=headers)
 print(response.text)
