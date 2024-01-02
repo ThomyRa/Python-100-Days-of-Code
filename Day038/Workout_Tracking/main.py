@@ -37,10 +37,12 @@ pprint(nutrix_response.json())
 nutrix_data = nutrix_response.json()
 
 SHEETY_URL = os.getenv("SHEETY_URL")
-
 today_date = datetime.now().strftime("%d/%m/%Y")
 now_time = datetime.now().strftime("%X")
 
+headers = {
+    "Authorization": os.getenv("SHEETY_TOKEN")
+}
 for exercise in nutrix_data["exercises"]:
     sheet_row = {
         "workout": {
@@ -52,5 +54,5 @@ for exercise in nutrix_data["exercises"]:
         }
     }
 
-    sheet_response = requests.post(url=SHEETY_URL, json=sheet_row)
+    sheet_response = requests.post(url=SHEETY_URL, json=sheet_row, headers=headers)
     print(sheet_response.text)
