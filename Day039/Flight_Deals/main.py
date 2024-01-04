@@ -3,21 +3,28 @@
 # program requirements.
 from data_manager import DataManager
 from flight_search import FlightSearch
+from datetime import datetime, timedelta
 
-flight_deals_sheet = DataManager()
+ORIGIN_CITY = "BOG"
+
+data_manager = DataManager()
 flight_search = FlightSearch()
-sheet_data = flight_deals_sheet.get_excel_data()
+sheet_data = data_manager.get_excel_data()
+print(type(sheet_data))
 
 if sheet_data[0]["iataCode"] == "":
     for row in sheet_data:
-        row["iataCode"] = flight_search.get_code(row["city"])
-        print(f"sheet_data:\n {sheet_data}")
+        row["iataCode"] = flight_search.get_destination_code(row["city"])
+    data_manager.destination_data = sheet_data
+    data_manager.update_destination_codes()
 
-    flight_deals_sheet.destination_data = sheet_data
-    flight_deals_sheet.update_destination_codes()
-# cities = flight_deals_sheet.get_cities()
-# codes = FlightSearch("manizales")
-# codes.get_code()
-# print(codes)
+tomorrow = datetime.now() + timedelta(days=1)
+six_months_from_today = datetime.now() + timedelta(days=(6 * 30))
 
-
+for destination in sheet_data:
+    flight = flight_search.search_flights(
+        origin=ORIGIN_CITY,
+        destination=destination["iataCode"],
+        from_time=tomorrow,
+        to_time=six_months_from_today
+    )
