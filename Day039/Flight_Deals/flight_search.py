@@ -20,7 +20,8 @@ class FlightSearch:
         parameters = {
             "term": city_name,
             "location_types": "city",
-            "limit": "1"
+            "limit": "1",
+            "locale": "es-ES"
         }
         response = requests.get(
             url=teq_location_url,
@@ -44,7 +45,7 @@ class FlightSearch:
             "nights_in_dst_to": 28,
             "one_for_city": 1,
             "max_stopovers": 0,
-            "curr": "GBP"
+            "curr": "COP"
         }
         response = requests.get(url=teq_search_url, params=query, headers=self.headers)
         try:
@@ -63,5 +64,5 @@ class FlightSearch:
             out_date=data["route"][0]["local_departure"].split("T")[0],
             return_date=data["route"][1]["local_departure"].split("T")[0],
         )
-        print(f"{flight_data.destination_city}: £{flight_data.price}")
+        print(f"{flight_data.destination_city}: ${flight_data.price}")
         return flight_data
