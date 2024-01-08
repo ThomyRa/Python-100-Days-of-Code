@@ -21,6 +21,3 @@ class NotificationManager:
             to=self.TO_PHONE
         )
         print(message.sid)
-
-
-
