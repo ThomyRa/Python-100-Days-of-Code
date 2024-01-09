@@ -7,7 +7,7 @@ data_manager = DataManager()
 sheet_data = data_manager.get_destination_data()
 flight_search = FlightSearch()
 notification_manager = NotificationManager()
-
+data_manager.get_user_emails()
 ORIGIN_CITY_IATA = "LON"
 
 if sheet_data[0]["iataCode"] == "":
@@ -37,4 +37,4 @@ for destination in sheet_data:
             message += f"\nFlight has {flight.stop_overs} stop over, via {flight.via_city}."
             print(message)
 
-        notification_manager.send_sms(message=message)
+        notification_manager.send_emails(message=message)

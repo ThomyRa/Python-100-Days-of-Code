@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 SHEETY_PRICES_ENDPOINT = os.getenv("SHEETY_URL")
+SHEETY_USERS_ENDPOINT = os.getenv("SHEETY_USERS_URL")
 
 
 class DataManager:
@@ -34,4 +35,14 @@ class DataManager:
                 json=new_data,
                 headers=self.headers,
             )
-            print(response.text)
+            # print(response.text)
+
+    def get_user_emails(self):
+        email_list = []
+        response = requests.get(url=SHEETY_USERS_ENDPOINT, headers=self.headers)
+        data = response.json()
+        for row in data["users"]:
+            email_list.append(row["email"])
+
+        print(email_list)
+        return email_list
