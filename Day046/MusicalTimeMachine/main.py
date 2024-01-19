@@ -9,17 +9,20 @@ import json
 
 date = input("Insert a date you want to search Billboard songs (YYYY-MM-DD): ")
 
-# URL = f"https://www.billboard.com/charts/hot-100/{date}"
-#
-# response = requests.get(url=URL)
-# soup = BeautifulSoup(response.text, "html.parser")
-#
-# song_info = soup.select("div .o-chart-results-list-row-container li .o-chart-results-list__item .a-no-trucate")
-# artists_list = [artist.getText().strip() for artist in song_info if song_info.index(artist) % 2 != 0]
+URL = f"https://www.billboard.com/charts/hot-100/{date}"
+
+response = requests.get(url=URL)
+soup = BeautifulSoup(response.text, "html.parser")
+
+song_info = soup.select("div .o-chart-results-list-row-container li .o-chart-results-list__item .a-no-trucate")
+artists_list = [artist.getText().strip() for artist in song_info if song_info.index(artist) % 2 != 0]
 # print(artists_list)
-#
-# songs_list = [artist.getText().strip() for artist in song_info if song_info.index(artist) % 2 == 0]
+
+songs_list = [artist.getText().strip() for artist in song_info if song_info.index(artist) % 2 == 0]
 # print(songs_list)
+
+songs_info = tuple(zip(songs_list, artists_list))
+pprint(songs_info)
 
 load_dotenv()
 
@@ -35,16 +38,20 @@ spotify = spotipy.Spotify(
     )
 )
 
-# with open("./token.txt") as file:
-#     file_contents = file.readline()
-#
-# token = json.loads(file_contents)
-#
-# with open("./.env", "a") as f:
-#     f.write(f'TOKEN = "Bearer {token["access_token"]}"')
-
 user_id = spotify.current_user()["id"]
-print(user_id)
+# print(user_id)
+
+song_uris = []
+year = date.split("-")[0]
+
+for song in songs_info:
+    result = spotify.search(q=f"track:{song[0]} artist:{song[1]} year:{year}", type="track")
+    print(result)
+    try:
+        uri = result["tracks"]["items"][0]["uri"]
+        song_uris.append(uri)
+    except IndexError:
+        print(f"{song} doesn't exist in Spotify. Skipped")
 
 playlist = spotify.user_playlist_create(
         user=user_id,
@@ -54,3 +61,5 @@ playlist = spotify.user_playlist_create(
         description="A musical time machine. Top 100 songs of a date in the past."
 )
 pprint(playlist)
+
+spotify.playlist_add_items(playlist_id=playlist["id"], items=song_uris)
