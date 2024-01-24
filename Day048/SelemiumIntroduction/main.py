@@ -23,8 +23,21 @@ driver = webdriver.Chrome(options=chrome_options)
 URL = "https://www.python.org"
 driver.get(url=URL)
 
+# Search elements by NAME
 search_bar = driver.find_element(By.NAME, "q")
-print(search_bar)
+print(search_bar.get_attribute("placeholder"))
+
+# Search elements by ID
+button = driver.find_element(By.ID, "submit")
+print(button.size)
+
+# Search element by CSS_SELECTOR
+documentation_link = driver.find_element(By.CSS_SELECTOR, ".documentation-widget a")
+print(documentation_link.get_attribute("href"))
+
+# Search element by X-PATH
+link = driver.find_element(By.XPATH, "/html/body/div/footer/div[2]/div/ul/li[3]/a")
+print(link.text)
 
 # Closes the entire Browser
 driver.quit()
