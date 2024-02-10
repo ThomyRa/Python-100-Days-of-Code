@@ -14,5 +14,5 @@ def say_bye():
 
 
 # To run the Flask app from IDE
-# if __name__ == "__main__":
-#     app.run()
+if __name__ == "__main__":
+    app.run()
