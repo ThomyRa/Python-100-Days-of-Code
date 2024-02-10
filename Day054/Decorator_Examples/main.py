@@ -6,9 +6,9 @@ print(current_time) # seconds since Jan 1st, 1970
 
 
 def speed_calc_decorator(f):
-    def wrapper(*args, **kargs):
+    def wrapper(*args, **kwargs):
         start_time = time.time()
-        f(*args, **kargs)
+        f(*args, **kwargs)
         stop_time = time.time()
         dt = stop_time - start_time
         print(f"{f.__name__} run speed: {dt}")
