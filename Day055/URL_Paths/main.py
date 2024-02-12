@@ -13,11 +13,11 @@ def say_bye():
     return "<h1>Bye</h1>"
 
 
-@app.route("/username/<name>")
+@app.route("/<name>")
 def greet(name):
     return f"Hello {name}!!"
 
 
 # To run the Flask app from IDE
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
