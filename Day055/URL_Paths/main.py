@@ -3,6 +3,24 @@ from flask import Flask
 app = Flask(__name__)
 
 
+def make_bold(f):
+    def wrapper():
+        return f'<b>{f()}</b>'
+    return wrapper
+
+
+def make_emphasis(f):
+    def wrapper():
+        return f'<em>{f()}</em>'
+    return wrapper
+
+
+def make_underline(f):
+    def wrapper():
+        return f'<u>{f()}</u>'
+    return wrapper
+
+
 @app.route("/")
 def hello_world():
     return ('<h1 style="text-align:center">Hello World!</h1>'
@@ -11,10 +29,14 @@ def hello_world():
 
 
 @app.route("/bye")
+@make_bold
+@make_emphasis
+@make_underline
 def say_bye():
-    return "<h1>Bye</h1>"
+    return "Bye"
 
 
+# Creating variable paths and converting the path to a specified data type
 @app.route("/username/<name>/<int:number>")
 def greet(name, number):
     return f"Hello {name}, you are {number} years old"
