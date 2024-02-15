@@ -13,9 +13,7 @@ def home():
     random_number = random.randint(1, 10)
     current_date = dt.datetime.now()
     current_year = current_date.year
-    return render_template("index.html",
-                           num=random_number,
-                           year=current_year)
+    return render_template("index.html", num=random_number, year=current_year)
 
 
 @app.route("/guess/<name>")
@@ -36,13 +34,10 @@ def guess(name):
     age_response.raise_for_status()
     age_data = age_response.json()
     age = age_data["age"]
-    return render_template("guess.html",
-                           name=str(name).capitalize(),
-                           gender=gender,
-                           age=age)
+    return render_template(
+        "guess.html", name=str(name).capitalize(), gender=gender, age=age
+    )
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
