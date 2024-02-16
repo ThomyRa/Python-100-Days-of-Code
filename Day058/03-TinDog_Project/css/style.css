@@ -21,3 +21,13 @@
   height: 3rem;
   border-radius: 0.75rem;
 }
+
+.profile-img {
+  height: 100px;
+  border-radius: 100%;
+}
+
+.testimonial-img {
+  width: 250px;
+  height: auto;
+}
