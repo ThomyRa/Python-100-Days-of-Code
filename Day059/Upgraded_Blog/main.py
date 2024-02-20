@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 import requests
+from post import Post
 import pdb
 from prettyprinter import pprint
 
@@ -18,8 +19,13 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    # pdb.set_trace()
     return render_template("index.html", all_posts=posts_data)
+
+
+@app.route("/blog/<int:post_id>")
+def blog_entry(post_id):
+    post = Post(posts_data[post_id - 1])
+    return render_template("post.html", post=post)
 
 
 @app.route("/about")
