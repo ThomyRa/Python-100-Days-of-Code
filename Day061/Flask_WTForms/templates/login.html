@@ -11,6 +11,13 @@
 		<h1>Login</h1>
 		<!-- This is where our form will go. -->
 
+		<form action="/login.html" method="POST">
+			{{ form.csfr_token }}
+			{{ form.email.label }} {{ form.email(size=30) }}
+			{{ form.password.label }} {{ form.password(size=30) }}
+
+			<input type="submit" value="Go">
+		</form>
 	</div>
 </body>
 
