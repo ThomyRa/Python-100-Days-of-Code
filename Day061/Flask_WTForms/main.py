@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 from dotenv import load_dotenv
+import pdb
 
 load_dotenv()
 app = Flask(__name__)
@@ -24,10 +25,10 @@ def home():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     login_form = LoginForm()
-    if login_form.validate_on_submit:
-        print(login_form.email.data)
-        if login_form.email.data == "admin@email.com" \
-                and login_form.password.data == "qwerty":
+    # pdb.set_trace()
+    if login_form.validate_on_submit():
+        print(f"The email is: {login_form.email.data}")
+        if login_form.email.data == "admin@email.com" and login_form.password.data == "qwerty":
             return render_template("success.html")
         else:
             return render_template("denied.html")
