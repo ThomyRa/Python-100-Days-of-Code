@@ -3,12 +3,15 @@ from flask import Flask, render_template, session
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
+from flask_bootstrap import Bootstrap5
 from dotenv import load_dotenv
 import pdb
 
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
+
+boostrap = Bootstrap5(app)
 
 
 class LoginForm(FlaskForm):
