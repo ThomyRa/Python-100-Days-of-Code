@@ -9,7 +9,7 @@ all_books = []
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', book_list=all_books)
 
 
 @app.route("/add", methods=["GET", "POST"])
