@@ -32,25 +32,28 @@ class Book(db.Model):
 with app.app_context():
     db.create_all()
 
-all_books = []
+# all_books = []
 
 
 @app.route('/')
 def home():
+    results = db.session.execute(db.select(Book).order_by(Book.title))
+    all_books = results.scalars()
+    # pdb.set_trace()
+
     return render_template('index.html', book_list=all_books)
 
 
 @app.route("/add", methods=["GET", "POST"])
 def add():
     if request.method == "POST":
-        with app.app_context():
-            new_book = Book(
-                title=request.form["title"],
-                author=request.form["author"],
-                rating=request.form["rating"]
-            )
-            db.session.add(new_book)
-            db.session.commit()
+        new_book = Book(
+            title=request.form["title"],
+            author=request.form["author"],
+            rating=request.form["rating"]
+        )
+        db.session.add(new_book)
+        db.session.commit()
         return redirect(url_for('home'))
     return render_template('add.html')
 
