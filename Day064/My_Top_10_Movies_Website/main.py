@@ -10,6 +10,7 @@ from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, URL
 import requests
 from dotenv import load_dotenv
+from prettyprinter import pprint
 import pdb
 
 
@@ -86,10 +87,24 @@ def home():
 
 @app.route("/add", methods=["GET", "POST"])
 def add_movie():
+    movies_info = {}
+    url = 'https://api.themoviedb.org/3/search/movie'
     form = MovieForm()
     if form.validate_on_submit():
-        print(request.form["title"])
-        return redirect(url_for('home'))
+        params = {
+            "query": request.form["title"],
+            "include_adult": False,
+        }
+        headers = {
+            "accept": "application/json",
+            "Authorization": f"Bearer {os.getenv("MOVIES_TOKEN")}"
+        }
+        response = requests.get(url=url, params=params, headers=headers)
+        response.raise_for_status()
+        movie_list = (response.json()["results"])
+        pprint(movie_list)
+        return render_template("select.html", options=movie_list)
+
     return render_template("add.html", form=form)
 
 
