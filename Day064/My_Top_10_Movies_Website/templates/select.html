@@ -7,7 +7,7 @@
     <h1 class="heading">Select Movie</h1>
     {% for movie in options: %}
     <p>
-        <a href="url_for('add', movie=movie)">{{ movie.original_title }}</a>
+        <a href="{{ url_for('get_movie_details', movie_id=movie.id) }}">{{ movie.original_title }} - ({{ movie.release_date }})</a>
     </p>
     {% endfor %}
 </div>

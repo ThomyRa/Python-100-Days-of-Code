@@ -102,10 +102,50 @@ def add_movie():
         response = requests.get(url=url, params=params, headers=headers)
         response.raise_for_status()
         movie_list = (response.json()["results"])
-        pprint(movie_list)
+        # pprint(movie_list)
         return render_template("select.html", options=movie_list)
 
     return render_template("add.html", form=form)
+
+
+@app.route("/select")
+def get_movie_details():
+    movie_id = request.args.get("movie_id")
+    # print(movie_id)
+    movie_details_url = f'https://api.themoviedb.org/3/movie/{movie_id}'
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {os.getenv("MOVIES_TOKEN")}"
+    }
+    response = requests.get(url=movie_details_url, headers=headers)
+    response.raise_for_status()
+    movie_details = response.json()
+    # pprint(movie_details)
+    img_backdrop_path = movie_details["backdrop_path"]
+    movie_title = movie_details["title"]
+    movie_release_year = movie_details["release_date"]
+    movie_overview = movie_details["overview"]
+    # print(img_backdrop_path, movie_title, movie_release_year, movie_overview)
+
+    images_url = 'https://api.themoviedb.org/3/configuration'
+    img_response = requests.get(url=images_url, headers=headers)
+    img_response.raise_for_status()
+    image_data = img_response.json()["images"]
+    base_url = image_data["secure_base_url"]
+    # print(base_url)
+
+    new_movie = Movie(
+        title=movie_title,
+        year=movie_release_year.split("-")[0],
+        description=movie_overview,
+        rating=None,
+        ranking=None,
+        review=None,
+        img_url=f"{base_url}/original{img_backdrop_path}"
+    )
+    db.session.add(new_movie)
+    db.session.commit()
+    return redirect(url_for('home'))
 
 
 @app.route("/delete")
