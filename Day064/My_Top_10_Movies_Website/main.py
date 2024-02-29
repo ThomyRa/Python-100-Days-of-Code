@@ -6,8 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Float
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, URL
 import requests
 from dotenv import load_dotenv
 import pdb
@@ -17,6 +17,13 @@ app = Flask(__name__)
 load_dotenv()
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 Bootstrap5(app)
+
+
+class MovieForm(FlaskForm):
+    title = StringField('Movie Name', validators=[DataRequired()])
+    # year = StringField('Year', validators=[DataRequired()])
+    # description = TextAreaField('Description', validators=[DataRequired()])
+    submit = SubmitField('Add')
 
 
 # CREATE DB
@@ -75,6 +82,24 @@ def home():
     result = db.session.execute(db.select(Movie).order_by(Movie.title))
     all_movies = result.scalars()
     return render_template("index.html", all_movies=all_movies)
+
+
+@app.route("/add", methods=["GET", "POST"])
+def add_movie():
+    form = MovieForm()
+    if form.validate_on_submit():
+        print(request.form["title"])
+        return redirect(url_for('home'))
+    return render_template("add.html", form=form)
+
+
+@app.route("/delete")
+def delete():
+    movie_id = request.args.get("id")
+    movie_to_delete = db.get_or_404(Movie, movie_id)
+    db.session.delete(movie_to_delete)
+    db.session.commit()
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':
