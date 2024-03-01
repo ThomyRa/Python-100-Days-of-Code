@@ -1,5 +1,4 @@
 import os
-import sqlalchemy.exc
 from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
@@ -18,13 +17,6 @@ app = Flask(__name__)
 load_dotenv()
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 Bootstrap5(app)
-
-
-class MovieForm(FlaskForm):
-    title = StringField('Movie Name', validators=[DataRequired()])
-    # year = StringField('Year', validators=[DataRequired()])
-    # description = TextAreaField('Description', validators=[DataRequired()])
-    submit = SubmitField('Add')
 
 
 # CREATE DB
@@ -51,6 +43,21 @@ class Movie(db.Model):
 
 with app.app_context():
     db.create_all()
+
+
+class FindMovieForm(FlaskForm):
+    title = StringField('Movie Name', validators=[DataRequired()])
+    # year = StringField('Year', validators=[DataRequired()])
+    # description = TextAreaField('Description', validators=[DataRequired()])
+    submit = SubmitField('Add')
+
+
+class RatingForm(FlaskForm):
+    rating = StringField('Your Rating', validators=[DataRequired()])
+    review = StringField('Your Review', validators=[DataRequired()])
+    # description = TextAreaField('Description', validators=[DataRequired()])
+    submit = SubmitField('Add')
+
 
 # After adding the new_movie the code needs to be commented out/deleted.
 # So you are not trying to add the same movie twice.
@@ -87,9 +94,8 @@ def home():
 
 @app.route("/add", methods=["GET", "POST"])
 def add_movie():
-    movies_info = {}
     url = 'https://api.themoviedb.org/3/search/movie'
-    form = MovieForm()
+    form = FindMovieForm()
     if form.validate_on_submit():
         params = {
             "query": request.form["title"],
@@ -102,17 +108,15 @@ def add_movie():
         response = requests.get(url=url, params=params, headers=headers)
         response.raise_for_status()
         movie_list = (response.json()["results"])
-        # pprint(movie_list)
         return render_template("select.html", options=movie_list)
-
     return render_template("add.html", form=form)
 
 
 @app.route("/select")
 def get_movie_details():
-    movie_id = request.args.get("movie_id")
+    movie_api_id = request.args.get("movie_id")
     # print(movie_id)
-    movie_details_url = f'https://api.themoviedb.org/3/movie/{movie_id}'
+    movie_details_url = f'https://api.themoviedb.org/3/movie/{movie_api_id}'
     headers = {
         "accept": "application/json",
         "Authorization": f"Bearer {os.getenv("MOVIES_TOKEN")}"
@@ -145,7 +149,23 @@ def get_movie_details():
     )
     db.session.add(new_movie)
     db.session.commit()
-    return redirect(url_for('home'))
+
+    movie_to_edit = db.session.execute(db.select(Movie).where(Movie.title == movie_title)).scalar()
+    movie_to_edit = movie_to_edit.id
+    return redirect(url_for('rate_movie', id=movie_to_edit))
+
+
+@app.route("/edit", methods=["GET", "POST"])
+def rate_movie():
+    rating_form = RatingForm()
+    movie_id = request.args.get("id")
+    movie = db.get_or_404(Movie, movie_id)
+    if rating_form.validate_on_submit():
+        movie.rating = float(rating_form.rating.data)
+        movie.review = rating_form.review.data
+        db.session.commit()
+        return redirect(url_for('home'))
+    return render_template("edit.html", movie=movie, form=rating_form)
 
 
 @app.route("/delete")
