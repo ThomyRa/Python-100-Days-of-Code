@@ -87,8 +87,12 @@ class RatingForm(FlaskForm):
 
 @app.route("/")
 def home():
-    result = db.session.execute(db.select(Movie).order_by(Movie.title))
-    all_movies = result.scalars()
+    result = db.session.execute(db.select(Movie).order_by(Movie.rating))
+    all_movies = result.scalars().all()
+    for idx, movie in enumerate(all_movies):
+        print(idx, movie.rating)
+        movie.ranking = len(all_movies) - idx
+    db.session.commit()
     return render_template("index.html", all_movies=all_movies)
 
 
