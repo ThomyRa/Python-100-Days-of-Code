@@ -2,6 +2,8 @@ from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
+import random
+import pdb
 
 
 app = Flask(__name__)
@@ -43,6 +45,13 @@ def home():
 
 
 # HTTP GET - Read Record
+@app.route("/random")
+def get_random_cafe():
+    result = db.session.execute(db.select(Cafe))
+    all_cafes = result.scalars().all()
+    random_cafe = random.choice(all_cafes)
+    # pdb.set_trace()
+    return f"Random Cafe: {random_cafe.name}"
 
 # HTTP POST - Create Record
 
