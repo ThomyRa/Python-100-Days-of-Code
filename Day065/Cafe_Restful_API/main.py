@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean, func
+from prettyprinter import pprint
 import random
 import pdb
 
@@ -61,7 +62,6 @@ def home():
 @app.route("/random")
 def get_random_cafe():
     random_cafe = db.session.execute(db.select(Cafe).order_by(func.random()).limit(1)).scalar()
-    return random_cafe.to_dict()
 
     # Manually Building the Response
     # return jsonify(
@@ -80,6 +80,18 @@ def get_random_cafe():
     #             "coffee_price": random_cafe.coffee_price,
     #         }
     #     })
+    return random_cafe.to_dict()
+
+
+@app.route("/all")
+def get_all_cafes():
+    results = db.session.execute(db.select(Cafe))
+    all_cafes = results.scalars().all()
+    all_cafes = [cafe.to_dict() for cafe in all_cafes]
+    # pprint(all_cafes)
+    return jsonify(
+        cafes=all_cafes,
+    )
 
 # HTTP POST - Create Record
 
