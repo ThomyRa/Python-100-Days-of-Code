@@ -89,9 +89,7 @@ def get_all_cafes():
     all_cafes = results.scalars().all()
     all_cafes = [cafe.to_dict() for cafe in all_cafes]
     # pprint(all_cafes)
-    return jsonify(
-        cafes=all_cafes,
-    )
+    return jsonify(cafes=all_cafes)
 
 
 @app.route("/search")
@@ -130,9 +128,34 @@ def add_cafe():
         db.session.commit()
         return jsonify(response={"Success": "Successfully added the new cafe."})
 
+
 # HTTP PUT/PATCH - Update Record
+@app.route("/update-price/<int:cafe_id>", methods=["GET", "PATCH"])
+def patch_cafe(cafe_id):
+    new_price = request.args.get("coffee_price")
+    cafe_to_patch = db.session.execute(db.select(Cafe).where(Cafe.id == cafe_id)).scalar()
+    if cafe_to_patch:
+        cafe_to_patch.coffee_price = new_price
+        db.session.commit()
+        return jsonify(response={"Success": "The coffee price has been updated successfully"})
+    else:
+        return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."})
+
 
 # HTTP DELETE - Delete Record
+@app.route("/report-closed/<int:cafe_id>")
+def delete_cafe(cafe_id):
+    api_key = request.args.get("api_key")
+    if api_key == "TopSecretAPIKey":
+        cafe_to_delete = db.session.execute(db.select(Cafe).where(Cafe.id == cafe_id)).scalar()
+        if cafe_to_delete:
+            db.session.delete(cafe_to_delete)
+            db.session.commit()
+            return jsonify(response={"Success": "Cafe deleted successfully"})
+        else:
+            return jsonify(error={"Error": "Sorry a cafe with that id was not found in the database."})
+    else:
+        return jsonify(error={"Error": "Sorry, you have no permission to delete cafes."})
 
 
 if __name__ == '__main__':
