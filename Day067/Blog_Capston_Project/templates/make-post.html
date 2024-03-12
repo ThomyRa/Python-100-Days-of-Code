@@ -27,9 +27,11 @@
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
         <!-- TODO:-Add CKEditor and render the form here -->
-        {{ render_form(form) }}
+        {{ ckeditor.load() }}
+        {{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
       </div>
     </div>
   </div>
 </main>
-{% include "footer.html" %} {% endblock %}
+{% include "footer.html" %}
+{% endblock %}
