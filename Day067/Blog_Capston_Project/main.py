@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
@@ -8,11 +9,22 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL
 from flask_ckeditor import CKEditor, CKEditorField
 from datetime import date
+from dotenv import load_dotenv
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 Bootstrap5(app)
+ckeditor = CKEditor(app)
+
+
+class PostForm(FlaskForm):
+    title = StringField('Post Name', validators=[DataRequired()])
+    subtitle = StringField('Subtitle', validators=[DataRequired()])
+    authors_name = StringField("Author's Name", validators=[DataRequired()])
+    img_url = StringField("Background Image", validators=[DataRequired(), URL()])
+    body = StringField("Post Body", validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 
 # CREATE DATABASE
@@ -54,10 +66,26 @@ def show_post(post_id):
 
 
 # TODO: add_new_post() to create a new blog post
+@app.route("/new-post", methods=["GET", "POST"])
+def add_new_post():
+    today = date.today()
+    form = PostForm()
+    if form.validate_on_submit():
+        new_post = BlogPost(
+            title=form.title,
+            subtitle=form.subtitle,
+            author=form.authors_name,
+            img_url=form.img_url,
+            body=form.body,
+            date=today.strftime('%B %d, %Y')
+        )
+        return redirect(url_for('get_all_posts'))
+    return render_template("make-post.html", form=form)
 
 # TODO: edit_post() to change an existing blog post
 
 # TODO: delete_post() to remove a blog post from the database
+
 
 # Below is the code from previous lessons. No changes needed.
 @app.route("/about")
