@@ -40,17 +40,19 @@ def home():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        name = request.form.get("name")
+        hash_and_salted_password = generate_password_hash(
+            password=request.form.get("password"),
+            method='pbkdf2:sha256',
+            salt_length=8
+        )
         new_user = User(
-            email=email,
-            password=password,
-            name=name
+            email=request.form.get("email"),
+            password=hash_and_salted_password,
+            name=request.form.get("name"),
         )
         db.session.add(new_user)
         db.session.commit()
-        return render_template("secrets.html", name=name)
+        return render_template("secrets.html", name=request.form.get("name"))
     return render_template("register.html")
 
 
