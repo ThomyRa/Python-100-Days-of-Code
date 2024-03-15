@@ -1,6 +1,4 @@
 import os
-
-import flask
 from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -30,11 +28,11 @@ login_manager.init_app(app)
 # Creates a user_loader callback
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return db.session.execute(db.select(User).where(User.id == user_id)).scalar()
 
 
 # CREATE TABLE IN DB
-class User(db.Model):
+class User(UserMixin, db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str] = mapped_column(String(100))
@@ -83,7 +81,7 @@ def login():
         user = result.scalar()
 
         # Checks stored password hash against entered password hashdd
-        if check_password_hash(user.passeord, password):
+        if check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('secrets'))
 
@@ -91,16 +89,21 @@ def login():
 
 
 @app.route('/secrets')
+@login_required
 def secrets():
-    return render_template("secrets.html")
+    print(current_user.name)
+    # Passing the name of the current user
+    return render_template("secrets.html", name=current_user.name)
 
 
 @app.route('/logout')
 def logout():
-    pass
+    logout_user()
+    return redirect(url_for('home'))
 
 
 @app.route('/download')
+@login_required
 def download():
     return send_from_directory(
         "static",
