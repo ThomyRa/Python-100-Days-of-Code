@@ -45,7 +45,7 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template("index.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -77,7 +77,7 @@ def register():
         login_user(new_user)
         # Redirects and get name from the current_user
         return render_template("secrets.html", name=request.form.get("name"))
-    return render_template("register.html")
+    return render_template("register.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -100,7 +100,7 @@ def login():
             login_user(user)
             return redirect(url_for('secrets'))
 
-    return render_template("login.html")
+    return render_template("login.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/secrets')
@@ -108,7 +108,7 @@ def login():
 def secrets():
     print(current_user.name)
     # Passing the name of the current user
-    return render_template("secrets.html", name=current_user.name)
+    return render_template("secrets.html", name=current_user.name, logged_in=True)
 
 
 @app.route('/logout')
