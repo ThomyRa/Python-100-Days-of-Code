@@ -11,9 +11,6 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-
 
 # CREATE DATABASE
 class Base(DeclarativeBase):
@@ -23,6 +20,17 @@ class Base(DeclarativeBase):
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+
+
+# Configure Flask-Login's Login Manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+# Creates a user_loader callback
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
 # CREATE TABLE IN DB
@@ -57,26 +65,27 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
+
+        # Log in and authenticate user after adding details to DB
+        login_user(new_user)
+        # Redirects and get name from the current_user
         return render_template("secrets.html", name=request.form.get("name"))
     return render_template("register.html")
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
 
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = request.form["email"]
-        print(user)
-        login_user(user)
-        flask.flash("Logged in successfully.")
+        email = request.form.get("email")
+        password = request.form.get("password")
 
-        # next = flask.request.args.get('next')
-        # if not url_has_allowed_host_and_scheme(next, request.host):
-        #     return flask.abort(400)
+        result = db.session.execute(db.select(User).where(User.email == email))
+        user = result.scalar()
+
+        # Checks stored password hash against entered password hashdd
+        if check_password_hash(user.passeord, password):
+            login_user(user)
+            return redirect(url_for('secrets'))
 
     return render_template("login.html")
 
