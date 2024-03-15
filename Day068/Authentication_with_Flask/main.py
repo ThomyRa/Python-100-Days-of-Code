@@ -1,4 +1,6 @@
 import os
+
+import flask
 from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -8,6 +10,9 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 # CREATE DATABASE
@@ -56,8 +61,23 @@ def register():
     return render_template("register.html")
 
 
-@app.route('/login')
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
+
+@app.route('/login', methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        user = request.form["email"]
+        print(user)
+        login_user(user)
+        flask.flash("Logged in successfully.")
+
+        # next = flask.request.args.get('next')
+        # if not url_has_allowed_host_and_scheme(next, request.host):
+        #     return flask.abort(400)
+
     return render_template("login.html")
 
 
