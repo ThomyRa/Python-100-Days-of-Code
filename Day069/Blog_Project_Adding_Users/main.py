@@ -13,7 +13,7 @@ from sqlalchemy import Integer, String, Text, ForeignKey
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm, LoginForm, ConnectForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 
 
 app = Flask(__name__)
@@ -67,15 +67,20 @@ class BlogPost(db.Model):
     __tablename__ = "blog_posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    # Create Foreign Key, "users.id" the users refers to the tablename of User.
-    author_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    # Create reference to the User object. The "posts" refers to the posts property in the User class.
-    author: Mapped["User"] = relationship(back_populates="posts")
     title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
     subtitle: Mapped[str] = mapped_column(String(250), nullable=False)
     date: Mapped[str] = mapped_column(String(250), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
+
+    # Create Foreign Key, "users.id" the users refers to the tablename of User.
+    author_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    # Create reference to the User object. The "posts" refers to the posts property in the User class.
+    author: Mapped["User"] = relationship(back_populates="posts")
+
+    # This will act like a List of Comment objects attached to each BlogPost.
+    # The "parent_post" refers to the parent_post property in the Comment class.
+    comments: Mapped[List["Comment"]] = relationship(back_populates="parent_post")
 
 
 class Comment(db.Model):
@@ -83,10 +88,16 @@ class Comment(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     text: Mapped[str] = mapped_column(Text(500), nullable=False)
+
     # Create Foreign Key, "users.id" the users refers to the tablename of User.
     author_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    # Create reference to the User object. The "posts" refers to the posts property in the User class.
+    # Create reference to the User object. The "comments" refers to the comments property in the User class.
     author: Mapped["User"] = relationship(back_populates="comments")
+
+    # Create Foreign Key, "blog_posts.id" the blog_posts refers to the tablename of BlogPost.
+    post_id: Mapped[int] = mapped_column(Integer, ForeignKey("blog_posts.id"))
+    # Create reference to the BlogPost object. The "comments" refers to the comments property in the BlogPost class.
+    parent_post: Mapped["BlogPost"] = relationship(back_populates="comments")
 
 
 with app.app_context():
@@ -159,16 +170,24 @@ def get_all_posts():
 
 
 # TODO: Allow logged-in users to comment on posts
-@app.route("/post/<int:post_id>")
+@app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
-    connect_form = ConnectForm()
-    if connect_form.validate_on_submit():
-        pass
-    return render_template("post.html", post=requested_post, current_user=current_user, form=connect_form)
+    comment_form = CommentForm()
+    if comment_form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash("You need to login or register to comment.")
+            return redirect(url_for("login"))
+        new_comment = Comment(
+            text=comment_form.comment.data,
+            author=current_user,
+            parent_post=requested_post
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+    return render_template("post.html", post=requested_post, current_user=current_user, form=comment_form)
 
 
-# TODO: Use a decorator so only an admin user can create a new post
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
 def add_new_post():
@@ -189,7 +208,6 @@ def add_new_post():
     return render_template("make-post.html", form=form, current_user=current_user)
 
 
-# TODO: Use a decorator so only an admin user can edit a post
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 @admin_only
 def edit_post(post_id):
@@ -212,7 +230,6 @@ def edit_post(post_id):
     return render_template("make-post.html", form=edit_form, is_edit=True, logged_in=current_user.is_authenticated)
 
 
-# TODO: Use a decorator so only an admin user can delete a post
 @app.route("/delete/<int:post_id>")
 @admin_only
 def delete_post(post_id):
