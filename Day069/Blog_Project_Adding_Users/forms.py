@@ -13,7 +13,6 @@ class CreatePostForm(FlaskForm):
     submit = SubmitField("Submit Post")
 
 
-# TODO: Create a RegisterForm to register new users
 class RegisterForm(FlaskForm):
     email = EmailField("Email", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
@@ -21,7 +20,6 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
 
-# TODO: Create a LoginForm to login existing users
 class LoginForm(FlaskForm):
     email = EmailField("Email", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
@@ -29,3 +27,6 @@ class LoginForm(FlaskForm):
 
 
 # TODO: Create a CommentForm so users can leave comments below posts
+class ConnectForm(FlaskForm):
+    comment = CKEditorField("Tell us what you think", validators=[DataRequired()])
+    submit = SubmitField("Submit Comment")
